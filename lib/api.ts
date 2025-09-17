@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { config } from './config';
 import {
   ApiResponse,
   AuthUser,
@@ -11,7 +12,7 @@ import {
 } from '@/types';
 
 // API configuration
-const API_BASE_URL = 'http://localhost:4500'; // Update this to your backend URL
+const API_BASE_URL = config.API_BASE_URL;
 const API_VERSION = '/api';
 
 class ApiService {
@@ -23,16 +24,16 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
-      timeout: 10000,
+      timeout: config.API_TIMEOUT,
     });
 
     // Add auth token to requests if available
-    this.client.interceptors.request.use(async (config) => {
-      const token = await AsyncStorage.getItem('auth_token');
+    this.client.interceptors.request.use(async (requestConfig) => {
+      const token = await AsyncStorage.getItem(config.STORAGE_KEYS.AUTH_TOKEN);
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        requestConfig.headers.Authorization = `Bearer ${token}`;
       }
-      return config;
+      return requestConfig;
     });
 
     // Handle unauthorized responses
@@ -40,8 +41,8 @@ class ApiService {
       (response) => response,
       async (error) => {
         if (error.response?.status === 401) {
-          await AsyncStorage.removeItem('auth_token');
-          await AsyncStorage.removeItem('user_data');
+          await AsyncStorage.removeItem(config.STORAGE_KEYS.AUTH_TOKEN);
+          await AsyncStorage.removeItem(config.STORAGE_KEYS.USER_DATA);
           // Redirect to login - you might want to use a navigation service here
         }
         return Promise.reject(error);
@@ -57,8 +58,8 @@ class ApiService {
     );
     
     const { data } = response.data;
-    await AsyncStorage.setItem('auth_token', data.token);
-    await AsyncStorage.setItem('user_data', JSON.stringify(data.user));
+    await AsyncStorage.setItem(config.STORAGE_KEYS.AUTH_TOKEN, data.token);
+    await AsyncStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(data.user));
     
     return data;
   }
@@ -70,15 +71,15 @@ class ApiService {
     );
     
     const { data } = response.data;
-    await AsyncStorage.setItem('auth_token', data.token);
-    await AsyncStorage.setItem('user_data', JSON.stringify(data.user));
+    await AsyncStorage.setItem(config.STORAGE_KEYS.AUTH_TOKEN, data.token);
+    await AsyncStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(data.user));
     
     return data;
   }
 
   async logout(): Promise<void> {
-    await AsyncStorage.removeItem('auth_token');
-    await AsyncStorage.removeItem('user_data');
+    await AsyncStorage.removeItem(config.STORAGE_KEYS.AUTH_TOKEN);
+    await AsyncStorage.removeItem(config.STORAGE_KEYS.USER_DATA);
   }
 
   async getCurrentUser(): Promise<User> {
@@ -93,7 +94,7 @@ class ApiService {
     );
     
     const updatedUser = response.data.data;
-    await AsyncStorage.setItem('user_data', JSON.stringify(updatedUser));
+    await AsyncStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
     
     return updatedUser;
   }

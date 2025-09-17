@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   ScrollView,
@@ -27,13 +27,7 @@ export default function RecipeDetailScreen() {
   const textColor = useThemeColor({}, 'text');
   const tintColor = useThemeColor({}, 'tint');
 
-  useEffect(() => {
-    if (id) {
-      fetchRecipe();
-    }
-  }, [id]);
-
-  const fetchRecipe = async () => {
+  const fetchRecipe = useCallback(async () => {
     try {
       const recipeData = await apiService.getRecipeById(id!);
       setRecipe(recipeData);
@@ -44,14 +38,20 @@ export default function RecipeDetailScreen() {
       if (userRatingData) {
         setUserRating(userRatingData.rating);
       }
-    } catch (error: any) {
-      console.error('Error fetching recipe:', error);
+    } catch {
+      console.error('Error fetching recipe');
       Alert.alert('Error', 'Failed to load recipe');
       router.back();
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id, user]);
+
+  useEffect(() => {
+    if (id) {
+      fetchRecipe();
+    }
+  }, [id, fetchRecipe]);
 
   const toggleSaveRecipe = async () => {
     if (!recipe) return;
@@ -66,7 +66,7 @@ export default function RecipeDetailScreen() {
         setIsSaved(true);
         Alert.alert('Success', 'Recipe saved!');
       }
-    } catch (error: any) {
+    } catch {
       Alert.alert('Error', 'Failed to update saved recipes');
     }
   };
@@ -83,7 +83,7 @@ export default function RecipeDetailScreen() {
       await fetchRecipe();
       
       Alert.alert('Success', 'Thank you for rating this recipe!');
-    } catch (error: any) {
+    } catch {
       Alert.alert('Error', 'Failed to rate recipe');
     } finally {
       setIsRating(false);

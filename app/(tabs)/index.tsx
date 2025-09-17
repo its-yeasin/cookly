@@ -15,13 +15,14 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/auth-context';
 import { apiService } from '@/lib/api';
+import { config } from '@/lib/config';
 import { Recipe } from '@/types';
 
 export default function HomeScreen() {
   const { user } = useAuth();
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [currentIngredient, setCurrentIngredient] = useState('');
-  const [servings, setServings] = useState(user?.preferences.defaultPortions.toString() || '4');
+  const [servings, setServings] = useState(user?.preferences.defaultPortions.toString() || config.DEFAULT_SERVINGS.toString());
   const [mealType, setMealType] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -55,7 +56,7 @@ export default function HomeScreen() {
     try {
       const recipe = await apiService.generateRecipe({
         ingredients,
-        servings: parseInt(servings) || 4,
+        servings: parseInt(servings) || config.DEFAULT_SERVINGS,
         mealType: mealType || undefined,
         difficulty: difficulty || undefined,
         dietaryRestrictions: user?.preferences.dietaryRestrictions || [],

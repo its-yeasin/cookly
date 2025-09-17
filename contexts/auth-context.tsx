@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, AuthUser, LoginRequest, RegisterRequest } from '@/types';
 import { apiService } from '@/lib/api';
+import { config } from '@/lib/config';
 
 interface AuthContextType {
   user: User | null;
@@ -40,8 +41,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuthState = async () => {
     try {
-      const token = await AsyncStorage.getItem('auth_token');
-      const userData = await AsyncStorage.getItem('user_data');
+      const token = await AsyncStorage.getItem(config.STORAGE_KEYS.AUTH_TOKEN);
+      const userData = await AsyncStorage.getItem(config.STORAGE_KEYS.USER_DATA);
 
       if (token && userData) {
         const parsedUser = JSON.parse(userData);
@@ -51,7 +52,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         try {
           const currentUser = await apiService.getCurrentUser();
           setUser(currentUser);
-          await AsyncStorage.setItem('user_data', JSON.stringify(currentUser));
+          await AsyncStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(currentUser));
         } catch (error) {
           // Token might be expired, clear storage
           await logout();

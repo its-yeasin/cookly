@@ -21,7 +21,7 @@ export default function ExploreScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [selectedFilter, setSelectedFilter] = useState<string>('');
 
   const textColor = useThemeColor({}, 'text');
   const tintColor = useThemeColor({}, 'tint');
@@ -34,7 +34,7 @@ export default function ExploreScreen() {
     { key: 'vegetarian', label: 'Vegetarian' },
   ];
 
-  const fetchRecipes = useCallback(async () => {
+  const fetchRecipes = async () => {
     try {
       const params: any = { page: 1, limit: 20 };
       
@@ -48,13 +48,13 @@ export default function ExploreScreen() {
 
       const result = await apiService.getRecipes(params);
       setRecipes(result.recipes);
-    } catch {
-      console.error('Error fetching recipes');
+    } catch (error: any) {
+      console.error('Error fetching recipes:', error);
       Alert.alert('Error', 'Failed to load recipes');
     } finally {
       setIsLoading(false);
     }
-  }, [selectedFilter]);
+  };
 
   const searchRecipes = async () => {
     if (!searchQuery.trim()) {
@@ -67,8 +67,8 @@ export default function ExploreScreen() {
       const ingredients = searchQuery.split(',').map(i => i.trim()).filter(i => i);
       const searchResults = await apiService.searchRecipesByIngredients(ingredients, 1, 20);
       setRecipes(searchResults);
-    } catch {
-      console.error('Error searching recipes');
+    } catch (error: any) {
+      console.error('Error searching recipes:', error);
       Alert.alert('Error', 'Failed to search recipes');
     } finally {
       setIsLoading(false);
@@ -84,7 +84,7 @@ export default function ExploreScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchRecipes();
-    }, [fetchRecipes])
+    }, [selectedFilter])
   );
 
   const renderRecipeItem = ({ item }: { item: Recipe }) => (
@@ -208,8 +208,6 @@ export default function ExploreScreen() {
       )}
     </ThemedView>
   );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
