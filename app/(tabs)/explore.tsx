@@ -1,75 +1,96 @@
-import React, { useState, useCallback } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { apiService } from "@/lib/api";
+import { Recipe } from "@/types";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
-  View,
+  Alert,
   FlatList,
   RefreshControl,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
-  Alert,
-} from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { apiService } from '@/lib/api';
-import { Recipe } from '@/types';
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function ExploreScreen() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [isSearchMode, setIsSearchMode] = useState(false);
 
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const textColor = useThemeColor({}, "text");
+  const tintColor = useThemeColor({}, "tint");
 
   const filters = [
-    { key: 'all', label: 'All' },
-    { key: 'breakfast', label: 'Breakfast' },
-    { key: 'lunch', label: 'Lunch' },
-    { key: 'dinner', label: 'Dinner' },
-    { key: 'vegetarian', label: 'Vegetarian' },
+    { key: "all", label: "All" },
+    { key: "breakfast", label: "Breakfast" },
+    { key: "lunch", label: "Lunch" },
+    { key: "dinner", label: "Dinner" },
+    { key: "vegetarian", label: "Vegetarian" },
   ];
 
   const fetchRecipes = useCallback(async () => {
+    console.log("fetching.....");
     try {
+      setIsLoading(true);
       const params: any = { page: 1, limit: 20 };
-      
-      if (selectedFilter && selectedFilter !== 'all') {
-        if (['breakfast', 'lunch', 'dinner'].includes(selectedFilter)) {
+
+      if (selectedFilter && selectedFilter !== "all") {
+        if (["breakfast", "lunch", "dinner"].includes(selectedFilter)) {
           params.mealType = selectedFilter;
-        } else if (selectedFilter === 'vegetarian') {
+        } else if (selectedFilter === "vegetarian") {
           params.isVegetarian = true;
         }
       }
 
       const result = await apiService.getRecipes(params);
       setRecipes(result.recipes);
-    } catch {
-      console.error('Error fetching recipes');
-      Alert.alert('Error', 'Failed to load recipes');
+      setIsSearchMode(false);
+    } catch (err) {
+      // console.error("Error fetching recipes");
+      console.log(err, "-----errr");
+      Alert.alert("Error", "Failed to load recipes");
     } finally {
       setIsLoading(false);
     }
   }, [selectedFilter]);
 
+  const clearSearch = () => {
+    setSearchQuery("");
+    setIsSearchMode(false);
+    fetchRecipes();
+  };
+
   const searchRecipes = async () => {
+    console.log("searching.....");
     if (!searchQuery.trim()) {
+      setIsSearchMode(false);
       fetchRecipes();
       return;
     }
 
     try {
       setIsLoading(true);
-      const ingredients = searchQuery.split(',').map(i => i.trim()).filter(i => i);
-      const searchResults = await apiService.searchRecipesByIngredients(ingredients, 1, 20);
+      setIsSearchMode(true);
+      const ingredients = searchQuery
+        .split(",")
+        .map((i) => i.trim())
+        .filter((i) => i);
+      const searchResults = await apiService.searchRecipesByIngredients(
+        ingredients,
+        1,
+        20
+      );
       setRecipes(searchResults);
     } catch {
-      console.error('Error searching recipes');
-      Alert.alert('Error', 'Failed to search recipes');
+      console.log("Error searching recipes");
+      Alert.alert("Error", "Failed to search recipes");
     } finally {
       setIsLoading(false);
     }
@@ -77,20 +98,27 @@ export default function ExploreScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchRecipes();
+    if (isSearchMode && searchQuery.trim()) {
+      await searchRecipes();
+    } else {
+      await fetchRecipes();
+    }
     setRefreshing(false);
   };
 
   useFocusEffect(
     useCallback(() => {
-      fetchRecipes();
-    }, [fetchRecipes])
+      if (!isSearchMode) {
+        fetchRecipes();
+      }
+    }, [fetchRecipes, isSearchMode])
   );
 
   const renderRecipeItem = ({ item }: { item: Recipe }) => (
     <TouchableOpacity
       style={styles.recipeCard}
-      onPress={() => router.push(`/recipe/${item._id}`)}>
+      onPress={() => router.push(`/recipe/${item._id}`)}
+    >
       <View style={styles.recipeContent}>
         <ThemedText type="defaultSemiBold" style={styles.recipeTitle}>
           {item.title}
@@ -108,7 +136,7 @@ export default function ExploreScreen() {
           <View style={styles.infoItem}>
             <IconSymbol name="star.fill" size={16} color="#FFD700" />
             <ThemedText style={styles.infoText}>
-              {item.averageRating?.toFixed(1) || 'N/A'}
+              {item.averageRating?.toFixed(1) || "N/A"}
             </ThemedText>
           </View>
           <View style={styles.infoItem}>
@@ -128,18 +156,20 @@ export default function ExploreScreen() {
     </TouchableOpacity>
   );
 
-  const renderFilterItem = ({ item }: { item: typeof filters[0] }) => (
+  const renderFilterItem = ({ item }: { item: (typeof filters)[0] }) => (
     <TouchableOpacity
       style={[
         styles.filterButton,
         selectedFilter === item.key && { backgroundColor: tintColor },
       ]}
-      onPress={() => setSelectedFilter(item.key)}>
+      onPress={() => setSelectedFilter(item.key)}
+    >
       <ThemedText
         style={[
           styles.filterButtonText,
-          selectedFilter === item.key && { color: '#fff' },
-        ]}>
+          selectedFilter === item.key && { color: "#fff" },
+        ]}
+      >
         {item.label}
       </ThemedText>
     </TouchableOpacity>
@@ -161,20 +191,34 @@ export default function ExploreScreen() {
     <ThemedView style={styles.container}>
       <View style={styles.header}>
         <ThemedText type="title">Explore Recipes</ThemedText>
-        
+
         <View style={styles.searchContainer}>
-          <TextInput
-            style={[styles.searchInput, { color: textColor, borderColor: tintColor }]}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search by ingredients (comma separated)"
-            placeholderTextColor="#666"
-            onSubmitEditing={searchRecipes}
-            returnKeyType="search"
-          />
+          <View style={styles.searchInputContainer}>
+            <TextInput
+              style={[
+                styles.searchInput,
+                { color: textColor, borderColor: tintColor },
+              ]}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search by ingredients (comma separated)"
+              placeholderTextColor="#666"
+              onSubmitEditing={searchRecipes}
+              returnKeyType="search"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={clearSearch}
+              >
+                <IconSymbol name="xmark.circle.fill" size={20} color="#666" />
+              </TouchableOpacity>
+            )}
+          </View>
           <TouchableOpacity
             style={[styles.searchButton, { backgroundColor: tintColor }]}
-            onPress={searchRecipes}>
+            onPress={searchRecipes}
+          >
             <IconSymbol name="magnifyingglass" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -188,7 +232,7 @@ export default function ExploreScreen() {
           style={styles.filtersList}
         />
       </View>
-      
+
       <FlatList
         data={recipes}
         renderItem={renderRecipeItem}
@@ -220,24 +264,34 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   searchContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginTop: 16,
     marginBottom: 16,
+  },
+  searchInputContainer: {
+    flex: 1,
+    position: "relative",
   },
   searchInput: {
     flex: 1,
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
+    paddingRight: 40,
     fontSize: 16,
+  },
+  clearButton: {
+    position: "absolute",
+    right: 10,
+    top: 14,
   },
   searchButton: {
     width: 48,
     height: 48,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   filtersList: {
     marginBottom: 8,
@@ -246,33 +300,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     marginRight: 8,
   },
   filterButtonText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   loading: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
   },
   listContainer: {
     padding: 16,
     paddingTop: 0,
   },
   recipeCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -291,13 +345,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   recipeInfo: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
     marginBottom: 8,
   },
   infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   infoText: {
@@ -307,27 +361,27 @@ const styles = StyleSheet.create({
   difficultyText: {
     fontSize: 12,
     opacity: 0.8,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   tag: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#e0e0e0",
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   tagText: {
     fontSize: 10,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 32,
     paddingTop: 100,
   },
@@ -336,7 +390,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyDescription: {
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.7,
   },
 });
