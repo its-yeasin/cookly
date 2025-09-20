@@ -1,19 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useAuth } from "@/contexts/auth-context";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { apiService } from "@/lib/api";
+import { Recipe } from "@/types";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
   ScrollView,
+  StatusBar,
   StyleSheet,
   TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useAuth } from '@/contexts/auth-context';
-import { apiService } from '@/lib/api';
-import { Recipe } from '@/types';
+  View,
+} from "react-native";
 
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,24 +26,28 @@ export default function RecipeDetailScreen() {
   const [isSaved, setIsSaved] = useState(false);
   const [isRating, setIsRating] = useState(false);
   const [userRating, setUserRating] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const textColor = useThemeColor({}, "text");
+  const tintColor = useThemeColor({}, "tint");
+  const backgroundColor = useThemeColor({}, "background");
 
   const fetchRecipe = useCallback(async () => {
     try {
       const recipeData = await apiService.getRecipeById(id!);
       setRecipe(recipeData);
       setIsSaved(user?.savedRecipes.includes(id!) || false);
-      
+
       // Check if user has rated this recipe
-      const userRatingData = recipeData.ratings.find(r => r.user === user?._id);
+      const userRatingData = recipeData.ratings.find(
+        (r) => r.user === user?._id
+      );
       if (userRatingData) {
         setUserRating(userRatingData.rating);
       }
     } catch {
-      console.error('Error fetching recipe');
-      Alert.alert('Error', 'Failed to load recipe');
+      console.error("Error fetching recipe");
+      Alert.alert("Error", "Failed to load recipe");
       router.back();
     } finally {
       setIsLoading(false);
@@ -60,14 +67,14 @@ export default function RecipeDetailScreen() {
       if (isSaved) {
         await apiService.unsaveRecipe(recipe._id);
         setIsSaved(false);
-        Alert.alert('Success', 'Recipe removed from saved');
+        Alert.alert("Success", "Recipe removed from saved");
       } else {
         await apiService.saveRecipe(recipe._id);
         setIsSaved(true);
-        Alert.alert('Success', 'Recipe saved!');
+        Alert.alert("Success", "Recipe saved!");
       }
     } catch {
-      Alert.alert('Error', 'Failed to update saved recipes');
+      Alert.alert("Error", "Failed to update saved recipes");
     }
   };
 
@@ -78,208 +85,306 @@ export default function RecipeDetailScreen() {
     try {
       await apiService.rateRecipe(recipe._id, rating);
       setUserRating(rating);
-      
+
       // Refresh recipe to get updated average rating
       await fetchRecipe();
-      
-      Alert.alert('Success', 'Thank you for rating this recipe!');
+
+      Alert.alert("Success", "Thank you for rating this recipe!");
     } catch {
-      Alert.alert('Error', 'Failed to rate recipe');
+      Alert.alert("Error", "Failed to rate recipe");
     } finally {
       setIsRating(false);
     }
   };
 
+  const generateShoppingList = async () => {
+    if (!recipe || isGenerating) return;
+
+    setIsGenerating(true);
+    try {
+      // Simulate API call for generating shopping list
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      Alert.alert("Success", "Shopping list generated!");
+    } catch {
+      Alert.alert("Error", "Failed to generate shopping list");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   if (isLoading) {
     return (
-      <ThemedView style={styles.container}>
-        <View style={styles.loading}>
-          <ThemedText>Loading recipe...</ThemedText>
-        </View>
-      </ThemedView>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor={backgroundColor}
+          translucent={false}
+        />
+        <ThemedView style={styles.container}>
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color={tintColor} />
+            <ThemedText style={styles.loadingText}>
+              Loading recipe...
+            </ThemedText>
+          </View>
+        </ThemedView>
+      </SafeAreaView>
     );
   }
 
   if (!recipe) {
     return (
-      <ThemedView style={styles.container}>
-        <View style={styles.loading}>
-          <ThemedText>Recipe not found</ThemedText>
-        </View>
-      </ThemedView>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor={backgroundColor}
+          translucent={false}
+        />
+        <ThemedView style={styles.container}>
+          <View style={styles.loading}>
+            <ThemedText>Recipe not found</ThemedText>
+          </View>
+        </ThemedView>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={backgroundColor}
+        translucent={false}
+      />
+      <ThemedView style={styles.container}>
+        <View style={[styles.header, { backgroundColor }]}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
             <IconSymbol name="arrow.left" size={24} color={textColor} />
           </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.saveButton} onPress={toggleSaveRecipe}>
-            <IconSymbol 
-              name="heart.fill" 
-              size={24} 
-              color={isSaved ? '#FF3B30' : textColor} 
+
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={toggleSaveRecipe}
+          >
+            <IconSymbol
+              name="heart.fill"
+              size={24}
+              color={isSaved ? "#FF3B30" : textColor}
             />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.titleSection}>
-          <ThemedText type="title" style={styles.title}>
-            {recipe.title}
-          </ThemedText>
-          <ThemedText style={styles.description}>
-            {recipe.description}
-          </ThemedText>
-        </View>
-
-        <View style={styles.infoSection}>
-          <View style={styles.infoRow}>
-            <View style={styles.infoItem}>
-              <IconSymbol name="clock" size={20} color={textColor} />
-              <ThemedText style={styles.infoLabel}>Total Time</ThemedText>
-              <ThemedText style={styles.infoValue}>{recipe.cookingTime.total} min</ThemedText>
-            </View>
-            
-            <View style={styles.infoItem}>
-              <IconSymbol name="person.fill" size={20} color={textColor} />
-              <ThemedText style={styles.infoLabel}>Servings</ThemedText>
-              <ThemedText style={styles.infoValue}>{recipe.servings}</ThemedText>
-            </View>
-            
-            <View style={styles.infoItem}>
-              <IconSymbol name="star.fill" size={20} color="#FFD700" />
-              <ThemedText style={styles.infoLabel}>Rating</ThemedText>
-              <ThemedText style={styles.infoValue}>
-                {recipe.averageRating?.toFixed(1) || 'N/A'}
-              </ThemedText>
-            </View>
-          </View>
-
-          <View style={styles.timingDetails}>
-            <View style={styles.timingItem}>
-              <ThemedText style={styles.timingLabel}>Prep: {recipe.cookingTime.prep} min</ThemedText>
-            </View>
-            <View style={styles.timingItem}>
-              <ThemedText style={styles.timingLabel}>Cook: {recipe.cookingTime.cook} min</ThemedText>
-            </View>
-            <View style={styles.timingItem}>
-              <ThemedText style={styles.timingLabel}>Difficulty: {recipe.difficulty}</ThemedText>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Ingredients
-          </ThemedText>
-          {recipe.ingredients.map((ingredient, index) => (
-            <View key={index} style={styles.ingredientItem}>
-              <ThemedText style={styles.ingredientText}>
-                {ingredient.amount} {ingredient.unit} {ingredient.name}
-              </ThemedText>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Instructions
-          </ThemedText>
-          {recipe.instructions
-            .sort((a, b) => a.stepNumber - b.stepNumber)
-            .map((instruction) => (
-              <View key={instruction.stepNumber} style={styles.instructionItem}>
-                <View style={[styles.stepNumber, { backgroundColor: tintColor }]}>
-                  <ThemedText style={styles.stepNumberText}>
-                    {instruction.stepNumber}
-                  </ThemedText>
-                </View>
-                <View style={styles.instructionContent}>
-                  <ThemedText style={styles.instructionText}>
-                    {instruction.description}
-                  </ThemedText>
-                  {instruction.duration && (
-                    <ThemedText style={styles.instructionDuration}>
-                      ⏱ {instruction.duration}
-                    </ThemedText>
-                  )}
-                </View>
-              </View>
-            ))}
-        </View>
-
-        <View style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Rate This Recipe
-          </ThemedText>
-          <View style={styles.ratingContainer}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <TouchableOpacity
-                key={star}
-                style={styles.starButton}
-                onPress={() => rateRecipe(star)}
-                disabled={isRating}>
-                <IconSymbol
-                  name="star.fill"
-                  size={32}
-                  color={star <= userRating ? '#FFD700' : '#E0E0E0'}
-                />
-              </TouchableOpacity>
-            ))}
-          </View>
-          {userRating > 0 && (
-            <ThemedText style={styles.ratingText}>
-              You rated this recipe {userRating} star{userRating !== 1 ? 's' : ''}
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.titleSection}>
+            <ThemedText type="title" style={styles.title}>
+              {recipe.title}
             </ThemedText>
-          )}
-        </View>
+            <ThemedText style={styles.description}>
+              {recipe.description}
+            </ThemedText>
+          </View>
 
-        {recipe.nutritionalInfo && (
+          <View style={styles.infoSection}>
+            <View style={styles.infoRow}>
+              <View style={styles.infoItem}>
+                <IconSymbol name="clock" size={20} color={textColor} />
+                <ThemedText style={styles.infoLabel}>Total Time</ThemedText>
+                <ThemedText style={styles.infoValue}>
+                  {recipe.cookingTime.total} min
+                </ThemedText>
+              </View>
+
+              <View style={styles.infoItem}>
+                <IconSymbol name="person.fill" size={20} color={textColor} />
+                <ThemedText style={styles.infoLabel}>Servings</ThemedText>
+                <ThemedText style={styles.infoValue}>
+                  {recipe.servings}
+                </ThemedText>
+              </View>
+
+              <View style={styles.infoItem}>
+                <IconSymbol name="star.fill" size={20} color="#FFD700" />
+                <ThemedText style={styles.infoLabel}>Rating</ThemedText>
+                <ThemedText style={styles.infoValue}>
+                  {recipe.averageRating?.toFixed(1) || "N/A"}
+                </ThemedText>
+              </View>
+            </View>
+
+            <View style={styles.timingDetails}>
+              <View style={styles.timingItem}>
+                <ThemedText style={styles.timingLabel}>
+                  Prep: {recipe.cookingTime.prep} min
+                </ThemedText>
+              </View>
+              <View style={styles.timingItem}>
+                <ThemedText style={styles.timingLabel}>
+                  Cook: {recipe.cookingTime.cook} min
+                </ThemedText>
+              </View>
+              <View style={styles.timingItem}>
+                <ThemedText style={styles.timingLabel}>
+                  Difficulty: {recipe.difficulty}
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+
           <View style={styles.section}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Nutrition (per serving)
+              Ingredients
             </ThemedText>
-            <View style={styles.nutritionGrid}>
-              {Object.entries(recipe.nutritionalInfo).map(([key, value]) => (
-                <View key={key} style={styles.nutritionItem}>
-                  <ThemedText style={styles.nutritionLabel}>
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </ThemedText>
-                  <ThemedText style={styles.nutritionValue}>
-                    {value}{key === 'calories' ? '' : 'g'}
-                  </ThemedText>
+            {recipe.ingredients.map((ingredient, index) => (
+              <View key={index} style={styles.ingredientItem}>
+                <ThemedText style={styles.ingredientText}>
+                  {ingredient.amount} {ingredient.unit} {ingredient.name}
+                </ThemedText>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.section}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              Instructions
+            </ThemedText>
+            {recipe.instructions
+              .sort((a, b) => a.stepNumber - b.stepNumber)
+              .map((instruction) => (
+                <View
+                  key={instruction.stepNumber}
+                  style={styles.instructionItem}
+                >
+                  <View
+                    style={[styles.stepNumber, { backgroundColor: tintColor }]}
+                  >
+                    <ThemedText style={styles.stepNumberText}>
+                      {instruction.stepNumber}
+                    </ThemedText>
+                  </View>
+                  <View style={styles.instructionContent}>
+                    <ThemedText style={styles.instructionText}>
+                      {instruction.description}
+                    </ThemedText>
+                    {instruction.duration && (
+                      <ThemedText style={styles.instructionDuration}>
+                        ⏱ {instruction.duration}
+                      </ThemedText>
+                    )}
+                  </View>
                 </View>
               ))}
-            </View>
           </View>
-        )}
-      </ScrollView>
-    </ThemedView>
+
+          <View style={styles.section}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              Rate This Recipe
+            </ThemedText>
+            <View style={styles.ratingContainer}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity
+                  key={star}
+                  style={styles.starButton}
+                  onPress={() => rateRecipe(star)}
+                  disabled={isRating}
+                >
+                  <IconSymbol
+                    name="star.fill"
+                    size={32}
+                    color={star <= userRating ? "#FFD700" : "#E0E0E0"}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+            {userRating > 0 && (
+              <ThemedText style={styles.ratingText}>
+                You rated this recipe {userRating} star
+                {userRating !== 1 ? "s" : ""}
+              </ThemedText>
+            )}
+          </View>
+
+          {recipe.nutritionalInfo && (
+            <View style={styles.section}>
+              <ThemedText type="subtitle" style={styles.sectionTitle}>
+                Nutrition (per serving)
+              </ThemedText>
+              <View style={styles.nutritionGrid}>
+                {Object.entries(recipe.nutritionalInfo).map(([key, value]) => (
+                  <View key={key} style={styles.nutritionItem}>
+                    <ThemedText style={styles.nutritionLabel}>
+                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                    </ThemedText>
+                    <ThemedText style={styles.nutritionValue}>
+                      {value}
+                      {key === "calories" ? "" : "g"}
+                    </ThemedText>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={[
+                styles.generateButton,
+                isGenerating && styles.generateButtonDisabled,
+              ]}
+              onPress={generateShoppingList}
+              disabled={isGenerating}
+            >
+              <View style={styles.generateButtonContent}>
+                {isGenerating ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <IconSymbol name="cart" size={20} color="#fff" />
+                )}
+                <ThemedText style={styles.generateButtonText}>
+                  {isGenerating ? "Generating..." : "Generate Shopping List"}
+                </ThemedText>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   container: {
     flex: 1,
   },
   content: {
     paddingBottom: 32,
+    paddingTop: 8,
+    flexGrow: 1,
   },
   loading: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    opacity: 0.7,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 16,
+    paddingBottom: 8,
+    zIndex: 1,
   },
   backButton: {
     padding: 8,
@@ -304,15 +409,15 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
   },
   infoItem: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 4,
   },
   infoLabel: {
@@ -321,14 +426,14 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   timingDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   timingItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   timingLabel: {
     fontSize: 14,
@@ -344,7 +449,7 @@ const styles = StyleSheet.create({
   ingredientItem: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     marginBottom: 8,
   },
@@ -352,7 +457,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   instructionItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 16,
     gap: 12,
   },
@@ -360,13 +465,13 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 4,
   },
   stepNumberText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
   },
   instructionContent: {
@@ -380,11 +485,11 @@ const styles = StyleSheet.create({
   instructionDuration: {
     fontSize: 14,
     opacity: 0.7,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   ratingContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 8,
     marginBottom: 16,
   },
@@ -392,20 +497,20 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   ratingText: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 14,
     opacity: 0.7,
   },
   nutritionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 16,
   },
   nutritionItem: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
     minWidth: 80,
   },
   nutritionLabel: {
@@ -415,6 +520,27 @@ const styles = StyleSheet.create({
   },
   nutritionValue: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
+  },
+  generateButton: {
+    backgroundColor: "#007AFF",
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  generateButtonDisabled: {
+    backgroundColor: "#B0B0B0",
+    opacity: 0.6,
+  },
+  generateButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  generateButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
