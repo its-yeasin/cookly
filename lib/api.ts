@@ -91,10 +91,8 @@ class ApiService {
   }
 
   async updateProfile(userData: Partial<User>): Promise<User> {
-    const response: AxiosResponse<ApiResponse<User>> = await this.client.put(
-      "/auth/profile",
-      userData
-    );
+    const response: AxiosResponse<ApiResponse<{ user: User }>> =
+      await this.client.put("/auth/profile", userData);
 
     const updatedUser = response.data.data;
     await AsyncStorage.setItem(
@@ -102,7 +100,7 @@ class ApiService {
       JSON.stringify(updatedUser)
     );
 
-    return updatedUser;
+    return updatedUser?.user;
   }
 
   // Recipe methods
