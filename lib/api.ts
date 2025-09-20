@@ -152,9 +152,9 @@ class ApiService {
   }
 
   async getSavedRecipes(): Promise<Recipe[]> {
-    const response: AxiosResponse<ApiResponse<Recipe[]>> =
+    const response: AxiosResponse<ApiResponse<{ recipes: Recipe[] }>> =
       await this.client.get("/recipes/saved");
-    return response.data.data;
+    return response.data.data?.recipes;
   }
 
   async saveRecipe(recipeId: string): Promise<void> {
