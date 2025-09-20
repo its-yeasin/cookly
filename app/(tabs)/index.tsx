@@ -1,54 +1,59 @@
-import React, { useState } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useAuth } from "@/contexts/auth-context";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { apiService } from "@/lib/api";
+import { config } from "@/lib/config";
+import { Recipe } from "@/types";
+import { router } from "expo-router";
+import React, { useState } from "react";
 import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  FlatList,
   Alert,
-} from 'react-native';
-import { router } from 'expo-router';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useAuth } from '@/contexts/auth-context';
-import { apiService } from '@/lib/api';
-import { config } from '@/lib/config';
-import { Recipe } from '@/types';
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function HomeScreen() {
   const { user } = useAuth();
   const [ingredients, setIngredients] = useState<string[]>([]);
-  const [currentIngredient, setCurrentIngredient] = useState('');
-  const [servings, setServings] = useState(user?.preferences.defaultPortions.toString() || config.DEFAULT_SERVINGS.toString());
-  const [mealType, setMealType] = useState('');
-  const [difficulty, setDifficulty] = useState('');
+  const [currentIngredient, setCurrentIngredient] = useState("");
+  const [servings, setServings] = useState(
+    user?.preferences.defaultPortions.toString() ||
+      config.DEFAULT_SERVINGS.toString()
+  );
+  const [mealType, setMealType] = useState("");
+  const [difficulty, setDifficulty] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
 
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const textColor = useThemeColor({}, "text");
+  const tintColor = useThemeColor({}, "tint");
 
-  const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
-  const difficulties = ['easy', 'medium', 'hard'];
+  const mealTypes = ["breakfast", "lunch", "dinner", "snack"];
+  const difficulties = ["easy", "medium", "hard"];
 
   const addIngredient = () => {
     const ingredient = currentIngredient.trim();
     if (ingredient && !ingredients.includes(ingredient)) {
       setIngredients([...ingredients, ingredient]);
-      setCurrentIngredient('');
+      setCurrentIngredient("");
     }
   };
 
   const removeIngredient = (ingredient: string) => {
-    setIngredients(ingredients.filter(i => i !== ingredient));
+    setIngredients(ingredients.filter((i) => i !== ingredient));
   };
+
+  console.log(generatedRecipe, "log-generateRecipe");
 
   const generateRecipe = async () => {
     if (ingredients.length === 0) {
-      Alert.alert('Error', 'Please add at least one ingredient');
+      Alert.alert("Error", "Please add at least one ingredient");
       return;
     }
 
@@ -61,12 +66,13 @@ export default function HomeScreen() {
         difficulty: difficulty || undefined,
         dietaryRestrictions: user?.preferences.dietaryRestrictions || [],
       });
-      
+      console.log(recipe, "generated-recipe");
       setGeneratedRecipe(recipe);
     } catch (error: any) {
       Alert.alert(
-        'Generation Failed',
-        error.response?.data?.message || 'Failed to generate recipe. Please try again.'
+        "Generation Failed",
+        error.response?.data?.message ||
+          "Failed to generate recipe. Please try again."
       );
     } finally {
       setIsGenerating(false);
@@ -96,10 +102,13 @@ export default function HomeScreen() {
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             Your Ingredients
           </ThemedText>
-          
+
           <View style={styles.addIngredientContainer}>
             <TextInput
-              style={[styles.ingredientInput, { color: textColor, borderColor: tintColor }]}
+              style={[
+                styles.ingredientInput,
+                { color: textColor, borderColor: tintColor },
+              ]}
               value={currentIngredient}
               onChangeText={setCurrentIngredient}
               placeholder="Add an ingredient"
@@ -109,7 +118,8 @@ export default function HomeScreen() {
             />
             <TouchableOpacity
               style={[styles.addButton, { backgroundColor: tintColor }]}
-              onPress={addIngredient}>
+              onPress={addIngredient}
+            >
               <IconSymbol name="plus" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -130,12 +140,15 @@ export default function HomeScreen() {
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             Recipe Options
           </ThemedText>
-          
+
           <View style={styles.optionRow}>
             <View style={styles.optionItem}>
               <ThemedText style={styles.optionLabel}>Servings</ThemedText>
               <TextInput
-                style={[styles.servingsInput, { color: textColor, borderColor: tintColor }]}
+                style={[
+                  styles.servingsInput,
+                  { color: textColor, borderColor: tintColor },
+                ]}
                 value={servings}
                 onChangeText={setServings}
                 keyboardType="numeric"
@@ -156,12 +169,14 @@ export default function HomeScreen() {
                       styles.optionButton,
                       mealType === type && { backgroundColor: tintColor },
                     ]}
-                    onPress={() => setMealType(mealType === type ? '' : type)}>
+                    onPress={() => setMealType(mealType === type ? "" : type)}
+                  >
                     <ThemedText
                       style={[
                         styles.optionButtonText,
-                        mealType === type && { color: '#fff' },
-                      ]}>
+                        mealType === type && { color: "#fff" },
+                      ]}
+                    >
                       {type.charAt(0).toUpperCase() + type.slice(1)}
                     </ThemedText>
                   </TouchableOpacity>
@@ -181,12 +196,16 @@ export default function HomeScreen() {
                       styles.optionButton,
                       difficulty === diff && { backgroundColor: tintColor },
                     ]}
-                    onPress={() => setDifficulty(difficulty === diff ? '' : diff)}>
+                    onPress={() =>
+                      setDifficulty(difficulty === diff ? "" : diff)
+                    }
+                  >
                     <ThemedText
                       style={[
                         styles.optionButtonText,
-                        difficulty === diff && { color: '#fff' },
-                      ]}>
+                        difficulty === diff && { color: "#fff" },
+                      ]}
+                    >
                       {diff.charAt(0).toUpperCase() + diff.slice(1)}
                     </ThemedText>
                   </TouchableOpacity>
@@ -203,10 +222,11 @@ export default function HomeScreen() {
             isGenerating && styles.disabledButton,
           ]}
           onPress={generateRecipe}
-          disabled={isGenerating || ingredients.length === 0}>
+          disabled={isGenerating || ingredients.length === 0}
+        >
           <IconSymbol name="sparkles" size={20} color="#fff" />
           <ThemedText style={styles.generateButtonText}>
-            {isGenerating ? 'Generating Recipe...' : 'Generate Recipe'}
+            {isGenerating ? "Generating Recipe..." : "Generate Recipe"}
           </ThemedText>
         </TouchableOpacity>
 
@@ -220,8 +240,11 @@ export default function HomeScreen() {
             </ThemedText>
             <TouchableOpacity
               style={[styles.viewRecipeButton, { backgroundColor: tintColor }]}
-              onPress={() => router.push(`/recipe/${generatedRecipe._id}`)}>
-              <ThemedText style={styles.viewRecipeButtonText}>View Full Recipe</ThemedText>
+              onPress={() => router.push(`/recipe/${generatedRecipe._id}`)}
+            >
+              <ThemedText style={styles.viewRecipeButtonText}>
+                View Full Recipe
+              </ThemedText>
             </TouchableOpacity>
           </View>
         )}
@@ -252,7 +275,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   addIngredientContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginBottom: 16,
   },
@@ -267,16 +290,16 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   ingredientsList: {
     marginTop: 8,
   },
   ingredientTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -294,7 +317,7 @@ const styles = StyleSheet.create({
   },
   optionLabel: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 8,
   },
   servingsInput: {
@@ -305,38 +328,38 @@ const styles = StyleSheet.create({
     width: 80,
   },
   optionsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   optionButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   optionButtonText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   generateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     padding: 16,
     borderRadius: 12,
     gap: 8,
     marginBottom: 24,
   },
   generateButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   disabledButton: {
     opacity: 0.6,
   },
   recipePreview: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
     padding: 16,
   },
@@ -351,10 +374,10 @@ const styles = StyleSheet.create({
   viewRecipeButton: {
     padding: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   viewRecipeButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
 });

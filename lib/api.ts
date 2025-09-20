@@ -1,19 +1,19 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { config } from './config';
 import {
   ApiResponse,
   AuthUser,
-  LoginRequest,
-  RegisterRequest,
-  Recipe,
   GenerateRecipeRequest,
+  LoginRequest,
+  Recipe,
+  RegisterRequest,
   User,
-} from '@/types';
+} from "@/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { config } from "./config";
 
 // API configuration
 const API_BASE_URL = config.API_BASE_URL;
-const API_VERSION = '/api';
+const API_VERSION = "/api";
 
 class ApiService {
   private client: AxiosInstance;
@@ -22,7 +22,7 @@ class ApiService {
     this.client = axios.create({
       baseURL: `${API_BASE_URL}${API_VERSION}`,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       timeout: config.API_TIMEOUT,
     });
@@ -52,28 +52,30 @@ class ApiService {
 
   // Authentication methods
   async login(credentials: LoginRequest): Promise<AuthUser> {
-    const response: AxiosResponse<ApiResponse<AuthUser>> = await this.client.post(
-      '/auth/login',
-      credentials
-    );
-    
+    const response: AxiosResponse<ApiResponse<AuthUser>> =
+      await this.client.post("/auth/login", credentials);
+
     const { data } = response.data;
     await AsyncStorage.setItem(config.STORAGE_KEYS.AUTH_TOKEN, data.token);
-    await AsyncStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(data.user));
-    
+    await AsyncStorage.setItem(
+      config.STORAGE_KEYS.USER_DATA,
+      JSON.stringify(data.user)
+    );
+
     return data;
   }
 
   async register(userData: RegisterRequest): Promise<AuthUser> {
-    const response: AxiosResponse<ApiResponse<AuthUser>> = await this.client.post(
-      '/auth/register',
-      userData
-    );
-    
+    const response: AxiosResponse<ApiResponse<AuthUser>> =
+      await this.client.post("/auth/register", userData);
+
     const { data } = response.data;
     await AsyncStorage.setItem(config.STORAGE_KEYS.AUTH_TOKEN, data.token);
-    await AsyncStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(data.user));
-    
+    await AsyncStorage.setItem(
+      config.STORAGE_KEYS.USER_DATA,
+      JSON.stringify(data.user)
+    );
+
     return data;
   }
 
@@ -83,29 +85,31 @@ class ApiService {
   }
 
   async getCurrentUser(): Promise<User> {
-    const response: AxiosResponse<ApiResponse<User>> = await this.client.get('/auth/me');
-    return response.data.data;
+    const response: AxiosResponse<ApiResponse<{ user: User }>> =
+      await this.client.get("/auth/me");
+    return response.data.data?.user;
   }
 
   async updateProfile(userData: Partial<User>): Promise<User> {
     const response: AxiosResponse<ApiResponse<User>> = await this.client.put(
-      '/auth/profile',
+      "/auth/profile",
       userData
     );
-    
+
     const updatedUser = response.data.data;
-    await AsyncStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
-    
+    await AsyncStorage.setItem(
+      config.STORAGE_KEYS.USER_DATA,
+      JSON.stringify(updatedUser)
+    );
+
     return updatedUser;
   }
 
   // Recipe methods
   async generateRecipe(request: GenerateRecipeRequest): Promise<Recipe> {
-    const response: AxiosResponse<ApiResponse<Recipe>> = await this.client.post(
-      '/recipes/generate',
-      request
-    );
-    return response.data.data;
+    const response: AxiosResponse<ApiResponse<{ recipe: Recipe }>> =
+      await this.client.post("/recipes/generate", request);
+    return response.data.data?.recipe;
   }
 
   async getRecipes(params?: {
@@ -115,35 +119,41 @@ class ApiService {
     page?: number;
     limit?: number;
   }): Promise<{ recipes: Recipe[]; pagination: any }> {
-    const response: AxiosResponse<ApiResponse<Recipe[]>> = await this.client.get('/recipes', {
+    const response: AxiosResponse<
+      ApiResponse<{ recipes: Recipe[]; pagination: any }>
+    > = await this.client.get("/recipes", {
       params,
     });
-    
+
     return {
-      recipes: response.data.data,
-      pagination: response.data.pagination,
+      recipes: response.data.data?.recipes,
+      pagination: response.data.data?.pagination,
     };
   }
 
   async getRecipeById(id: string): Promise<Recipe> {
-    const response: AxiosResponse<ApiResponse<Recipe>> = await this.client.get(`/recipes/${id}`);
-    return response.data.data;
+    const response: AxiosResponse<ApiResponse<{ recipe: Recipe }>> =
+      await this.client.get(`/recipes/${id}`);
+    return response.data.data?.recipe;
   }
 
-  async searchRecipesByIngredients(ingredients: string[], minMatch = 1, limit = 10): Promise<Recipe[]> {
-    const response: AxiosResponse<ApiResponse<Recipe[]>> = await this.client.post(
-      '/recipes/search-by-ingredients',
-      {
+  async searchRecipesByIngredients(
+    ingredients: string[],
+    minMatch = 1,
+    limit = 10
+  ): Promise<Recipe[]> {
+    const response: AxiosResponse<ApiResponse<Recipe[]>> =
+      await this.client.post("/recipes/search-by-ingredients", {
         ingredients,
         minMatch,
         limit,
-      }
-    );
+      });
     return response.data.data;
   }
 
   async getSavedRecipes(): Promise<Recipe[]> {
-    const response: AxiosResponse<ApiResponse<Recipe[]>> = await this.client.get('/recipes/saved');
+    const response: AxiosResponse<ApiResponse<Recipe[]>> =
+      await this.client.get("/recipes/saved");
     return response.data.data;
   }
 
@@ -155,7 +165,11 @@ class ApiService {
     await this.client.delete(`/recipes/${recipeId}/save`);
   }
 
-  async rateRecipe(recipeId: string, rating: number, comment?: string): Promise<void> {
+  async rateRecipe(
+    recipeId: string,
+    rating: number,
+    comment?: string
+  ): Promise<void> {
     await this.client.post(`/recipes/${recipeId}/rate`, {
       rating,
       comment,
@@ -164,7 +178,7 @@ class ApiService {
 
   // Health check
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
-    const response = await this.client.get('/health');
+    const response = await this.client.get("/health");
     return response.data;
   }
 }

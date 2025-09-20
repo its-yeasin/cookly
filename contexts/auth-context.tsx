@@ -1,8 +1,14 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, AuthUser, LoginRequest, RegisterRequest } from '@/types';
-import { apiService } from '@/lib/api';
-import { config } from '@/lib/config';
+import { apiService } from "@/lib/api";
+import { config } from "@/lib/config";
+import { AuthUser, LoginRequest, RegisterRequest, User } from "@/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface AuthContextType {
   user: User | null;
@@ -19,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
@@ -42,24 +48,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuthState = async () => {
     try {
       const token = await AsyncStorage.getItem(config.STORAGE_KEYS.AUTH_TOKEN);
-      const userData = await AsyncStorage.getItem(config.STORAGE_KEYS.USER_DATA);
+      const userData = await AsyncStorage.getItem(
+        config.STORAGE_KEYS.USER_DATA
+      );
 
       if (token && userData) {
         const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        
+        setUser(parsedUser?.user);
+
         // Optionally verify token is still valid
         try {
           const currentUser = await apiService.getCurrentUser();
           setUser(currentUser);
-          await AsyncStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(currentUser));
+          await AsyncStorage.setItem(
+            config.STORAGE_KEYS.USER_DATA,
+            JSON.stringify(currentUser)
+          );
         } catch (error) {
           // Token might be expired, clear storage
           await logout();
         }
       }
     } catch (error) {
-      console.error('Error checking auth state:', error);
+      console.error("Error checking auth state:", error);
       await logout();
     } finally {
       setIsLoading(false);
@@ -95,7 +106,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await apiService.logout();
       setUser(null);
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error("Error during logout:", error);
       // Still clear local state even if API call fails
       setUser(null);
     }
