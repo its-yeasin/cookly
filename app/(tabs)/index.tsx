@@ -79,6 +79,8 @@ export default function HomeScreen() {
     }
   };
 
+  const isDisabled = isGenerating || ingredients.length === 0;
+
   const renderIngredient = ({ item }: { item: string }) => (
     <View style={styles.ingredientTag}>
       <ThemedText style={styles.ingredientText}>{item}</ThemedText>
@@ -219,10 +221,10 @@ export default function HomeScreen() {
           style={[
             styles.generateButton,
             { backgroundColor: tintColor },
-            isGenerating && styles.disabledButton,
+            isDisabled && styles.disabledButton,
           ]}
           onPress={generateRecipe}
-          disabled={isGenerating || ingredients.length === 0}
+          disabled={isDisabled}
         >
           <IconSymbol name="sparkles" size={20} color="#fff" />
           <ThemedText style={styles.generateButtonText}>
