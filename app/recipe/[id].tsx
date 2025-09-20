@@ -26,7 +26,7 @@ export default function RecipeDetailScreen() {
   const [isSaved, setIsSaved] = useState(false);
   const [isRating, setIsRating] = useState(false);
   const [userRating, setUserRating] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
+  // const [isGenerating, setIsGenerating] = useState(false);
 
   const textColor = useThemeColor({}, "text");
   const tintColor = useThemeColor({}, "tint");
@@ -97,20 +97,20 @@ export default function RecipeDetailScreen() {
     }
   };
 
-  const generateShoppingList = async () => {
-    if (!recipe || isGenerating) return;
+  // const generateShoppingList = async () => {
+  //   if (!recipe || isGenerating) return;
 
-    setIsGenerating(true);
-    try {
-      // Simulate API call for generating shopping list
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      Alert.alert("Success", "Shopping list generated!");
-    } catch {
-      Alert.alert("Error", "Failed to generate shopping list");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  //   setIsGenerating(true);
+  //   try {
+  //     // Simulate API call for generating shopping list
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
+  //     Alert.alert("Success", "Shopping list generated!");
+  //   } catch {
+  //     Alert.alert("Error", "Failed to generate shopping list");
+  //   } finally {
+  //     setIsGenerating(false);
+  //   }
+  // };
 
   if (isLoading) {
     return (
@@ -327,7 +327,7 @@ export default function RecipeDetailScreen() {
             </View>
           )}
 
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <TouchableOpacity
               style={[
                 styles.generateButton,
@@ -347,7 +347,7 @@ export default function RecipeDetailScreen() {
                 </ThemedText>
               </View>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </ScrollView>
       </ThemedView>
     </SafeAreaView>
