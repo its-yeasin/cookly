@@ -53,8 +53,8 @@ export default function ExploreScreen() {
       setRecipes(result.recipes);
       setIsSearchMode(false);
     } catch (err) {
-      // console.error("Error fetching recipes");
-      console.log(err, "-----errr");
+      console.log("Error fetching recipes", err);
+
       Alert.alert("Error", "Failed to load recipes");
     } finally {
       setIsLoading(false);

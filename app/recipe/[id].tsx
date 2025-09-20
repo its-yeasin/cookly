@@ -45,8 +45,8 @@ export default function RecipeDetailScreen() {
       if (userRatingData) {
         setUserRating(userRatingData.rating);
       }
-    } catch {
-      console.error("Error fetching recipe");
+    } catch (err: any) {
+      console.log("Error fetching recipe", err);
       Alert.alert("Error", "Failed to load recipe");
       router.back();
     } finally {

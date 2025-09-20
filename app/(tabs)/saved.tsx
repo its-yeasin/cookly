@@ -1,35 +1,35 @@
-import React, { useState, useCallback } from 'react';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { apiService } from "@/lib/api";
+import { Recipe } from "@/types";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
-  View,
+  Alert,
   FlatList,
   RefreshControl,
   StyleSheet,
   TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { apiService } from '@/lib/api';
-import { Recipe } from '@/types';
+  View,
+} from "react-native";
 
 export default function SavedScreen() {
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
+  const textColor = useThemeColor({}, "text");
+  const tintColor = useThemeColor({}, "tint");
 
   const fetchSavedRecipes = async () => {
     try {
       const recipes = await apiService.getSavedRecipes();
       setSavedRecipes(recipes);
     } catch (error: any) {
-      console.error('Error fetching saved recipes:', error);
-      Alert.alert('Error', 'Failed to load saved recipes');
+      console.log("Error fetching saved recipes:", error);
+      Alert.alert("Error", "Failed to load saved recipes");
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +50,8 @@ export default function SavedScreen() {
   const renderRecipeItem = ({ item }: { item: Recipe }) => (
     <TouchableOpacity
       style={styles.recipeCard}
-      onPress={() => router.push(`/recipe/${item._id}`)}>
+      onPress={() => router.push(`/recipe/${item._id}`)}
+    >
       <View style={styles.recipeContent}>
         <ThemedText type="defaultSemiBold" style={styles.recipeTitle}>
           {item.title}
@@ -68,7 +69,7 @@ export default function SavedScreen() {
           <View style={styles.infoItem}>
             <IconSymbol name="star.fill" size={16} color="#FFD700" />
             <ThemedText style={styles.infoText}>
-              {item.averageRating?.toFixed(1) || 'N/A'}
+              {item.averageRating?.toFixed(1) || "N/A"}
             </ThemedText>
           </View>
         </View>
@@ -87,8 +88,11 @@ export default function SavedScreen() {
       </ThemedText>
       <TouchableOpacity
         style={[styles.exploreButton, { backgroundColor: tintColor }]}
-        onPress={() => router.push('/explore')}>
-        <ThemedText style={styles.exploreButtonText}>Explore Recipes</ThemedText>
+        onPress={() => router.push("/explore")}
+      >
+        <ThemedText style={styles.exploreButtonText}>
+          Explore Recipes
+        </ThemedText>
       </TouchableOpacity>
     </View>
   );
@@ -108,7 +112,7 @@ export default function SavedScreen() {
       <View style={styles.header}>
         <ThemedText type="title">Saved Recipes</ThemedText>
       </View>
-      
+
       <FlatList
         data={savedRecipes}
         renderItem={renderRecipeItem}
@@ -135,19 +139,19 @@ const styles = StyleSheet.create({
   },
   loading: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   listContainer: {
     padding: 16,
     paddingTop: 0,
   },
   recipeCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -166,12 +170,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   recipeInfo: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
   },
   infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   infoText: {
@@ -180,8 +184,8 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 32,
     paddingTop: 100,
   },
@@ -190,7 +194,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyDescription: {
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.7,
     marginBottom: 24,
   },
@@ -200,7 +204,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   exploreButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
 });

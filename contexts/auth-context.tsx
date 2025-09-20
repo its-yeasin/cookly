@@ -70,7 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       }
     } catch (error) {
-      console.error("Error checking auth state:", error);
+      console.log("Error checking auth state:", error);
       await logout();
     } finally {
       setIsLoading(false);
@@ -106,7 +106,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await apiService.logout();
       setUser(null);
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.log("Error during logout:", error);
       // Still clear local state even if API call fails
       setUser(null);
     }
