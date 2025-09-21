@@ -119,8 +119,8 @@ export default function AboutScreen() {
           </View>
 
           <View style={styles.infoItem}>
-            <ThemedText style={styles.infoLabel}>Developer:</ThemedText>
-            <ThemedText style={styles.infoValue}>MD Jamal</ThemedText>
+            <ThemedText style={styles.infoLabel}>Developed By:</ThemedText>
+            <ThemedText style={styles.infoValue}>AppsQuery</ThemedText>
           </View>
         </View>
 
