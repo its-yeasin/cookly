@@ -37,10 +37,7 @@ export default function RootLayout() {
               headerBackVisible: false,
             }}
           />
-          <Stack.Screen
-            name="about"
-            options={{ title: "About", headerShown: false }}
-          />
+          <Stack.Screen name="about" options={{ title: "About Cookly" }} />
           <Stack.Screen
             name="modal"
             options={{ presentation: "modal", title: "Modal" }}
