@@ -156,11 +156,11 @@ class ApiService {
   }
 
   async saveRecipe(recipeId: string): Promise<void> {
-    await this.client.post(`/recipes/${recipeId}/save`);
+    await this.client.post(`/recipes/${recipeId}/save`, {});
   }
 
   async unsaveRecipe(recipeId: string): Promise<void> {
-    await this.client.delete(`/recipes/${recipeId}/save`);
+    await this.client.delete(`/recipes/${recipeId}/save`, {});
   }
 
   async rateRecipe(
