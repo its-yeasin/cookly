@@ -1,7 +1,8 @@
 // API Configuration
 export const config = {
   // Update this URL to point to your backend server
-  API_BASE_URL: "http://192.168.31.96:4500",
+  // API_BASE_URL: "http://192.168.31.96:4500",
+  API_BASE_URL: "https://cookly-backend.vercel.app",
 
   // API timeout in milliseconds
   API_TIMEOUT: 10000,
