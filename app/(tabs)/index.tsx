@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import {
   Alert,
   FlatList,
+  Image,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -94,10 +95,19 @@ export default function HomeScreen() {
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <ThemedText type="title">Welcome to Cookly</ThemedText>
-          <ThemedText style={styles.subtitle}>
-            Generate amazing recipes from your ingredients
-          </ThemedText>
+          <View style={styles.headerContent}>
+            <Image
+              source={require("@/assets/images/icon.png")}
+              style={styles.appIcon}
+              resizeMode="contain"
+            />
+            <View style={styles.headerText}>
+              <ThemedText type="title">Welcome to Cookly</ThemedText>
+              <ThemedText style={styles.subtitle}>
+                Generate amazing recipes from your ingredients
+              </ThemedText>
+            </View>
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -265,6 +275,19 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 32,
+  },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  appIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+  },
+  headerText: {
+    flex: 1,
   },
   subtitle: {
     marginTop: 8,
