@@ -7,7 +7,7 @@ A modern Node.js backend for the Cookly mobile app - an AI-powered recipe genera
 - **AI-Powered Recipe Generation**: Uses Azure OpenAI to create unique recipes from ingredients
 - **User Authentication**: Secure JWT-based authentication with password hashing
 - **Recipe Management**: Save, rate, and organize personal recipe collections
-- **Advanced Search**: Find recipes by ingredients, dietary restrictions, and preferences
+- **Advanced Search**: Find recipes by ingredients, and preferences
 - **MongoDB Integration**: Robust data persistence with Mongoose ODM
 - **Input Validation**: Comprehensive request validation using Joi
 - **Error Handling**: Centralized error handling with detailed logging

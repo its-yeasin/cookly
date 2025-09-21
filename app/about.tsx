@@ -81,7 +81,6 @@ export default function AboutScreen() {
                 "Personalized recipe recommendations",
                 "Step-by-step cooking instructions",
                 "Save and organize your favorite recipes",
-                "Dietary restriction support",
                 "Nutritional information",
               ].map((feature, index) => (
                 <View key={index} style={styles.featureItem}>
