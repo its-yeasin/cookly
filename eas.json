@@ -12,10 +12,24 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "distribution": "store",
+      "android": {
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease",
+        "buildArtifactPaths": [
+          "android/app/build/outputs/bundle/release/app-release.aab",
+          "android/app/build/outputs/mapping/release/mapping.txt"
+        ]
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "track": "internal",
+        "releaseStatus": "completed"
+      }
+    }
   }
 }
