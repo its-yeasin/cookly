@@ -14,6 +14,7 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -164,6 +165,16 @@ export default function RecipeDetailScreen() {
           >
             <IconSymbol name="arrow.left" size={24} color={textColor} />
           </TouchableOpacity>
+
+          <Text
+            style={{
+              fontSize: 26,
+              fontWeight: "600",
+              color: textColor,
+            }}
+          >
+            Recipe Details
+          </Text>
 
           <TouchableOpacity
             style={styles.saveButton}
@@ -384,6 +395,7 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 16,
     paddingBottom: 8,
+    marginBottom: 8,
     zIndex: 1,
   },
   backButton: {
