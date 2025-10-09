@@ -3,7 +3,6 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
-import { Colors } from "@/constants/theme";
 import { AuthProvider } from "@/contexts/auth-context";
 
 export const unstable_settings = {
@@ -11,15 +10,6 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  // Create custom theme with unified background color
-  const customTheme = {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      background: Colors.light.background, // Use unified white background
-    },
-  };
-
   return (
     <AuthProvider>
       <ThemeProvider value={DefaultTheme}>
