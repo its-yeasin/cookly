@@ -142,6 +142,17 @@ curl -X POST http://localhost:5000/api/auth/register \
   }'
 ```
 
+### Change Password
+
+```bash
+curl -X POST http://localhost:5000/api/auth/change-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currentPassword": "Password123",
+    "newPassword": "Password456",
+  }'
+```
+
 ### Generate a Recipe
 
 ```bash

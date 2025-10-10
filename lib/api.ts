@@ -1,6 +1,7 @@
 import {
   ApiResponse,
   AuthUser,
+  ChangePasswordRequest,
   GenerateRecipeRequest,
   LoginRequest,
   Recipe,
@@ -101,6 +102,10 @@ class ApiService {
     );
 
     return updatedUser?.user;
+  }
+
+  async changePassword(passwordData: ChangePasswordRequest): Promise<void> {
+    await this.client.put("/auth/change-password", passwordData);
   }
 
   // Recipe methods

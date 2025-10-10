@@ -98,6 +98,11 @@ export interface RegisterRequest {
   preferences?: Partial<UserPreferences>;
 }
 
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface GenerateRecipeRequest {
   ingredients: string[];
   servings?: number;
@@ -127,11 +132,12 @@ export interface ApiError {
 
 // Navigation types
 export type RootStackParamList = {
-  '(tabs)': undefined;
-  'auth/login': undefined;
-  'auth/register': undefined;
-  'recipe/[id]': { id: string };
-  'modal': undefined;
+  "(tabs)": undefined;
+  "auth/login": undefined;
+  "auth/register": undefined;
+  "recipe/[id]": { id: string };
+  "change-password": undefined;
+  modal: undefined;
 };
 
 export type TabParamList = {

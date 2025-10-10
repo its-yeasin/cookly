@@ -200,6 +200,17 @@ export default function ProfileScreen() {
           <View style={styles.actionsSection}>
             <TouchableOpacity
               style={[styles.menuButton, { borderColor: tintColor }]}
+              onPress={() => router.push("/change-password")}
+            >
+              <IconSymbol name="lock" size={16} color={tintColor} />
+              <ThemedText style={[styles.menuButtonText, { color: tintColor }]}>
+                Change Password
+              </ThemedText>
+              <IconSymbol name="chevron.right" size={16} color={tintColor} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.menuButton, { borderColor: tintColor }]}
               onPress={() => router.push("/about")}
             >
               <IconSymbol name="info.circle" size={16} color={tintColor} />
