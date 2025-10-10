@@ -2,14 +2,13 @@
   "expo": {
     "name": "cookly",
     "slug": "cookly",
-    "version": "1.0.2",
-    "orientation": "portrait",
+    "version": "1.0.3",
     "icon": "./assets/images/icon.png",
     "scheme": "cookly",
-    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "requireFullScreen": false
     },
     "android": {
       "adaptiveIcon": {
@@ -18,11 +17,12 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
       "package": "com.jamal0763.cookly",
       "proguardDebugVariants": "none",
-      "proguardReleaseVariants": "none"
+      "proguardReleaseVariants": "none",
+      "supportsTablet": true,
+      "resizeableActivity": true,
+      "supportsPictureInPicture": false
     },
     "web": {
       "output": "static",
@@ -40,6 +40,12 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-system-ui",
+        {
+          "userInterfaceStyle": "automatic"
         }
       ]
     ],
