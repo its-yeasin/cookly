@@ -51,7 +51,7 @@ export default function AboutScreen() {
             <ThemedText type="subtitle" style={styles.appTitle}>
               Cookly
             </ThemedText>
-            <ThemedText style={styles.version}>Version 1.0.0</ThemedText>
+            <ThemedText style={styles.version}>Version 1.0.2</ThemedText>
           </View>
 
           {/* App Description */}
@@ -103,7 +103,7 @@ export default function AboutScreen() {
 
             <View style={styles.infoItem}>
               <ThemedText style={styles.infoLabel}>Version:</ThemedText>
-              <ThemedText style={styles.infoValue}>1.0.0</ThemedText>
+              <ThemedText style={styles.infoValue}>1.0.2</ThemedText>
             </View>
 
             <View style={styles.infoItem}>
