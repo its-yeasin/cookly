@@ -1,6 +1,6 @@
 # Cookly Mobile App - Release Notes
 
-## Version 1.0.3 - Android Compatibility & Password Management Update
+## Version 1.1.0 - Android Compatibility & Password Management Update
 
 **Release Date:** October 10, 2025
 
@@ -180,7 +180,7 @@
 
 If you encounter any issues with this update:
 
-1. Check that you're running the latest version (1.0.3)
+1. Check that you're running the latest version (1.1.0)
 2. Restart the app after updating
 3. For foldable devices, try rotating the device to test new orientation support
 4. Report any issues through the app or our support channels
