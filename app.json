@@ -2,7 +2,7 @@
   "expo": {
     "name": "cookly",
     "slug": "cookly",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "icon": "./assets/images/icon.png",
     "scheme": "cookly",
     "newArchEnabled": true,
