@@ -37,7 +37,8 @@ export default function RecipeDetailScreen() {
     try {
       const recipeData = await apiService.getRecipeById(id!);
       setRecipe(recipeData);
-      setIsSaved(user?.savedRecipes.includes(id!) || false);
+      const savedRecipes = await apiService.getSavedRecipes();
+      setIsSaved(savedRecipes.some((r) => r._id === id) || false);
 
       // Check if user has rated this recipe
       const userRatingData = recipeData.ratings.find(

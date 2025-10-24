@@ -83,7 +83,7 @@ export default function ChangePasswordScreen() {
       />
       <ThemedView style={styles.container}>
         <ScrollView contentContainerStyle={styles.content}>
-          <View style={styles.header}>
+          {/* <View style={styles.header}>
             <TouchableOpacity
               style={styles.backButton}
               onPress={() => router.back()}
@@ -91,7 +91,7 @@ export default function ChangePasswordScreen() {
               <IconSymbol name="chevron.left" size={24} color={tintColor} />
             </TouchableOpacity>
             <ThemedText type="title">Change Password</ThemedText>
-          </View>
+          </View> */}
 
           <View style={styles.form}>
             <ThemedText style={styles.description}>
@@ -259,9 +259,10 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 1,
+    paddingTop: 10,
   },
   description: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 32,
     opacity: 0.7,
     lineHeight: 22,

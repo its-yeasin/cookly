@@ -2,7 +2,23 @@
 
 ## Version 1.0.3 - Android Compatibility & Password Management Update
 
-**Release Date:** October 10, 2025
+**Release Date:** October 24, 2025
+
+---
+
+## 📱 **Play Console Release Summary**
+
+**What's New in v1.0.3:**
+
+🔒 New: Change password feature in Profile settings
+📱 Fixed: Android 15 compatibility issues resolved  
+📺 Enhanced: Full support for foldables, tablets, and large screens
+🔄 Improved: Multi-window, split-screen, and all orientations supported
+🛡️ Updated: Android 16 ready with future-proof configuration
+⚡ Simplified: Streamlined password change interface
+
+**About Cookly:**
+Transform your ingredients into delicious recipes with AI! Add ingredients, set preferences, and get personalized recipes instantly.
 
 ---
 
@@ -11,9 +27,10 @@
 #### **🔒 Password Management**
 
 - **New Change Password Feature**: Users can now securely update their passwords from the profile screen
-- **Enhanced Security**: Form validation with password strength requirements
-- **User-Friendly Interface**: Toggle password visibility with eye icons for better usability
-- **Real-time Validation**: Instant feedback on password requirements and confirmation matching
+- **Streamlined Interface**: Simple two-field form (current password and new password)
+- **Enhanced Security**: Form validation with minimum password length requirements
+- **User-Friendly Design**: Toggle password visibility with eye icons for better usability
+- **Real-time Validation**: Instant feedback on password requirements
 
 #### **📱 Android 15/16 Compatibility Fixes**
 
@@ -49,9 +66,9 @@
 
 #### **Security Improvements**
 
-- Secure password validation with minimum length requirements
+- Secure password validation with minimum 6-character requirement
 - Current password verification before allowing changes
-- Password confirmation matching validation
+- Simplified password change process without confirmation field
 - Clear security tips and best practices display
 
 ---

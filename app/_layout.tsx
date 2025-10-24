@@ -33,6 +33,10 @@ export default function RootLayout() {
           />
           <Stack.Screen name="about" options={{ title: "About Cookly" }} />
           <Stack.Screen
+            name="change-password"
+            options={{ title: "Change Password" }}
+          />
+          <Stack.Screen
             name="modal"
             options={{ presentation: "modal", title: "Modal" }}
           />

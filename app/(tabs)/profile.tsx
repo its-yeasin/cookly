@@ -8,7 +8,6 @@ import React, { useState } from "react";
 import {
   Alert,
   Image,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -16,12 +15,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const { user, logout, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || "");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get safe area insets for proper spacing
+  const insets = useSafeAreaInsets();
 
   const textColor = useThemeColor({}, "text");
   const tintColor = useThemeColor({}, "tint");
@@ -69,182 +72,173 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor={backgroundColor}
         translucent={false}
       />
-      <ThemedView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <View style={styles.header}>
-            <View style={styles.headerContent}>
-              <Image
-                source={require("@/assets/images/icon.png")}
-                style={styles.appIcon}
-                resizeMode="contain"
-              />
-              <ThemedText type="title">Profile</ThemedText>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: insets.bottom + 20 },
+        ]}
+      >
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+            <Image
+              source={require("@/assets/images/icon.png")}
+              style={styles.appIcon}
+              resizeMode="contain"
+            />
+            <ThemedText type="title">Profile</ThemedText>
+          </View>
+        </View>
+
+        <View style={styles.profileSection}>
+          <View style={styles.avatarContainer}>
+            <View style={[styles.avatar, { backgroundColor: tintColor }]}>
+              <ThemedText style={styles.avatarText}>
+                {user.name.charAt(0).toUpperCase()}
+              </ThemedText>
             </View>
           </View>
 
-          <View style={styles.profileSection}>
-            <View style={styles.avatarContainer}>
-              <View style={[styles.avatar, { backgroundColor: tintColor }]}>
-                <ThemedText style={styles.avatarText}>
-                  {user.name.charAt(0).toUpperCase()}
-                </ThemedText>
-              </View>
-            </View>
-
-            <View style={styles.infoSection}>
-              <View style={styles.infoItem}>
-                <ThemedText style={styles.label}>Name</ThemedText>
-                {isEditing ? (
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { color: textColor, borderColor: tintColor },
-                    ]}
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="Enter your name"
-                    placeholderTextColor="#666"
-                  />
-                ) : (
-                  <ThemedText style={styles.value}>{user.name}</ThemedText>
-                )}
-              </View>
-
-              <View style={styles.infoItem}>
-                <ThemedText style={styles.label}>Email</ThemedText>
-                <ThemedText style={styles.value}>{user.email}</ThemedText>
-              </View>
-
-              <View style={styles.infoItem}>
-                <ThemedText style={styles.label}>Member Since</ThemedText>
-                <ThemedText style={styles.value}>
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </ThemedText>
-              </View>
-
-              <View style={styles.infoItem}>
-                <ThemedText style={styles.label}>Saved Recipes</ThemedText>
-                <ThemedText style={styles.value}>
-                  {user.savedRecipes.length}
-                </ThemedText>
-              </View>
-            </View>
-
-            {isEditing ? (
-              <View style={styles.editButtons}>
-                <TouchableOpacity
-                  style={[styles.button, styles.cancelButton]}
-                  onPress={handleCancel}
-                >
-                  <ThemedText style={styles.cancelButtonText}>
-                    Cancel
-                  </ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity
+          <View style={styles.infoSection}>
+            <View style={styles.infoItem}>
+              <ThemedText style={styles.label}>Name</ThemedText>
+              {isEditing ? (
+                <TextInput
                   style={[
-                    styles.button,
-                    styles.saveButton,
-                    { backgroundColor: tintColor },
+                    styles.input,
+                    { color: textColor, borderColor: tintColor },
                   ]}
-                  onPress={handleSave}
-                  disabled={isLoading}
-                >
-                  <ThemedText style={styles.saveButtonText}>
-                    {isLoading ? "Saving..." : "Save"}
-                  </ThemedText>
-                </TouchableOpacity>
-              </View>
-            ) : (
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="Enter your name"
+                  placeholderTextColor="#666"
+                />
+              ) : (
+                <ThemedText style={styles.value}>{user.name}</ThemedText>
+              )}
+            </View>
+
+            <View style={styles.infoItem}>
+              <ThemedText style={styles.label}>Email</ThemedText>
+              <ThemedText style={styles.value}>{user.email}</ThemedText>
+            </View>
+
+            <View style={styles.infoItem}>
+              <ThemedText style={styles.label}>Member Since</ThemedText>
+              <ThemedText style={styles.value}>
+                {new Date(user.createdAt).toLocaleDateString()}
+              </ThemedText>
+            </View>
+
+            <View style={styles.infoItem}>
+              <ThemedText style={styles.label}>Saved Recipes</ThemedText>
+              <ThemedText style={styles.value}>
+                {user.savedRecipes.length}
+              </ThemedText>
+            </View>
+          </View>
+
+          {isEditing ? (
+            <View style={styles.editButtons}>
               <TouchableOpacity
-                style={[styles.editButton, { borderColor: tintColor }]}
-                onPress={() => setIsEditing(true)}
+                style={[styles.button, styles.cancelButton]}
+                onPress={handleCancel}
               >
-                <IconSymbol name="pencil" size={16} color={tintColor} />
-                <ThemedText
-                  style={[styles.editButtonText, { color: tintColor }]}
-                >
-                  Edit Profile
+                <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  styles.saveButton,
+                  { backgroundColor: tintColor },
+                ]}
+                onPress={handleSave}
+                disabled={isLoading}
+              >
+                <ThemedText style={styles.saveButtonText}>
+                  {isLoading ? "Saving..." : "Save"}
                 </ThemedText>
               </TouchableOpacity>
-            )}
-          </View>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[styles.editButton, { borderColor: tintColor }]}
+              onPress={() => setIsEditing(true)}
+            >
+              <IconSymbol name="pencil" size={16} color={tintColor} />
+              <ThemedText style={[styles.editButtonText, { color: tintColor }]}>
+                Edit Profile
+              </ThemedText>
+            </TouchableOpacity>
+          )}
+        </View>
 
-          <View style={styles.preferencesSection}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Preferences
+        <View style={styles.preferencesSection}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            Preferences
+          </ThemedText>
+
+          <View style={styles.preferenceItem}>
+            <ThemedText style={styles.label}>Dietary Restrictions</ThemedText>
+            <ThemedText style={styles.value}>
+              {user.preferences.dietaryRestrictions.length > 0
+                ? user.preferences.dietaryRestrictions.join(", ")
+                : "None"}
             </ThemedText>
-
-            <View style={styles.preferenceItem}>
-              <ThemedText style={styles.label}>Dietary Restrictions</ThemedText>
-              <ThemedText style={styles.value}>
-                {user.preferences.dietaryRestrictions.length > 0
-                  ? user.preferences.dietaryRestrictions.join(", ")
-                  : "None"}
-              </ThemedText>
-            </View>
-
-            <View style={styles.preferenceItem}>
-              <ThemedText style={styles.label}>Default Portions</ThemedText>
-              <ThemedText style={styles.value}>
-                {user.preferences.defaultPortions}
-              </ThemedText>
-            </View>
           </View>
 
-          <View style={styles.actionsSection}>
-            <TouchableOpacity
-              style={[styles.menuButton, { borderColor: tintColor }]}
-              onPress={() => router.push("/change-password")}
-            >
-              <IconSymbol name="lock" size={16} color={tintColor} />
-              <ThemedText style={[styles.menuButtonText, { color: tintColor }]}>
-                Change Password
-              </ThemedText>
-              <IconSymbol name="chevron.right" size={16} color={tintColor} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.menuButton, { borderColor: tintColor }]}
-              onPress={() => router.push("/about")}
-            >
-              <IconSymbol name="info.circle" size={16} color={tintColor} />
-              <ThemedText style={[styles.menuButtonText, { color: tintColor }]}>
-                About Cookly
-              </ThemedText>
-              <IconSymbol name="chevron.right" size={16} color={tintColor} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={handleLogout}
-            >
-              <IconSymbol name="arrow.left" size={16} color="#FF3B30" />
-              <ThemedText style={styles.logoutText}>Logout</ThemedText>
-            </TouchableOpacity>
+          <View style={styles.preferenceItem}>
+            <ThemedText style={styles.label}>Default Portions</ThemedText>
+            <ThemedText style={styles.value}>
+              {user.preferences.defaultPortions}
+            </ThemedText>
           </View>
-        </ScrollView>
-      </ThemedView>
-    </SafeAreaView>
+        </View>
+
+        <View style={styles.actionsSection}>
+          <TouchableOpacity
+            style={[styles.menuButton, { borderColor: tintColor }]}
+            onPress={() => router.push("/change-password")}
+          >
+            <IconSymbol name="lock" size={16} color={tintColor} />
+            <ThemedText style={[styles.menuButtonText, { color: tintColor }]}>
+              Change Password
+            </ThemedText>
+            <IconSymbol name="chevron.right" size={16} color={tintColor} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.menuButton, { borderColor: tintColor }]}
+            onPress={() => router.push("/about")}
+          >
+            <IconSymbol name="info.circle" size={16} color={tintColor} />
+            <ThemedText style={[styles.menuButtonText, { color: tintColor }]}>
+              About Cookly
+            </ThemedText>
+            <IconSymbol name="chevron.right" size={16} color={tintColor} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <IconSymbol name="arrow.left" size={16} color="#FF3B30" />
+            <ThemedText style={styles.logoutText}>Logout</ThemedText>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
   container: {
     flex: 1,
   },
   content: {
     padding: 20,
-    paddingTop: 25,
   },
   header: {
     marginBottom: 32,
