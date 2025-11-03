@@ -1,6 +1,6 @@
 # Cookly Mobile App
 
-An AI-powered recipe generator mobile app built with Expo and React Native. Generate personalized recipes based on available ingredients using Azure OpenAI.
+An AI-powered recipe generator mobile app built with Expo and React Native. Generate personalized recipes based on available ingredients using AI.
 
 ## 🚀 Features
 
@@ -16,7 +16,7 @@ An AI-powered recipe generator mobile app built with Expo and React Native. Gene
 - Node.js >= 16.0.0
 - npm or yarn
 - Expo CLI (`npm install -g @expo/cli`)
-- [Cookly Backend](https://github.com/its-yeasin/Cookly-Backend) running on your server
+- [Cookly Backend](https://github.com/its-yeasin/Cookly-Backend)
 
 ## ⚙️ Installation
 
